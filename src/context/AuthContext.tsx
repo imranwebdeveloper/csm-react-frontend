@@ -1,108 +1,30 @@
-"use client";
-
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from "react";
-
-// import {
-//   login as apiLogin,
-//   register as apiRegister,
-//   logout as apiLogout,
-//   getCurrentUser,
-// } from "@/lib/api";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  bio?: string;
-  avatar?: string;
-  createdAt: string;
-  contentCount?: number;
-  draftCount?: number;
-}
+import { removeUserFromStorage, saveUserToStorage } from "@/lib/storage";
+import { AuthUser } from "@/types";
+import { createContext, useState } from "react";
 
 interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
-  register: (userData: {
-    name: string;
-    email: string;
-    password: string;
-  }) => Promise<void>;
-  logout: () => Promise<void>;
-  updateUser: (userData: Partial<User>) => void;
+  user: AuthUser | null;
+  login: (credentials: AuthUser) => Promise<void>;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
 
-  useEffect(() => {
-    const initAuth = async () => {
-      //   try {
-      //     const userData = await getCurrentUser();
-      //     setUser(userData);
-      //   } catch (error) {
-      //     setUser(null);
-      //   } finally {
-      //     setIsLoading(false);
-      //   }
-    };
-
-    initAuth();
-  }, []);
-
-  const login = async (credentials: { email: string; password: string }) => {
-    // setIsLoading(true);
-    // try {
-    //   const userData = await apiLogin(credentials);
-    //   setUser(userData);
-    // } finally {
-    //   setIsLoading(false);
-    // }
+  const login = async (user: AuthUser) => {
+    saveUserToStorage(user);
+    setUser(user);
   };
 
-  const register = async (userData: {
-    name: string;
-    email: string;
-    password: string;
-  }) => {
-    // setIsLoading(true);
-    // try {
-    //   await apiRegister(userData);
-    // } finally {
-    //   setIsLoading(false);
-    // }
-  };
-
-  const logout = async () => {
-    // setIsLoading(true);
-    // try {
-    //   await apiLogout();
-    //   setUser(null);
-    // } finally {
-    //   setIsLoading(false);
-    // }
-  };
-
-  const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      setUser({ ...user, ...userData });
-    }
+  const logout = () => {
+    setUser(null);
+    removeUserFromStorage();
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, isLoading, login, register, logout, updateUser }}
-    >
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

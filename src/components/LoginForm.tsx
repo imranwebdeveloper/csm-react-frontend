@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import {
@@ -14,6 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router";
+import { loginUser } from "@/api/authApi";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { ApiSingleResponse, AuthUser } from "@/types";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -21,33 +24,15 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function LoginForm() {
-  //   const router = useRouter();
-  //   const { toast } = useToast();
   const { login } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (values: any) => {
-    setIsSubmitting(true);
-    try {
-      await login(values);
-      //   toast.success({
-      //     title: "Login successful",
-      //     description: "You have been logged in successfully",
-      //   });
-      //   router.push("/dashboard");
-    } catch (error: any) {
-      //   toast({
-      //     title: "Login failed",
-      //     description: error.message || "Invalid credentials",
-      //     variant: "destructive",
-      //   });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const mutation = useMutation({
+    mutationFn: async (values: { email: string; password: string }) => {
+      return loginUser(values);
+    },
+  });
 
   return (
-    <div className="container max-w-md mx-auto py-10">
+    <div className="container max-w-md mt-10 mx-auto py-10">
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
@@ -61,9 +46,27 @@ export default function LoginForm() {
             password: "",
           }}
           validationSchema={LoginSchema}
-          onSubmit={handleSubmit}
+          onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+            mutation.mutate(values, {
+              onSuccess: (data: ApiSingleResponse<AuthUser>) => {
+                login(data.data);
+                toast.success("Login successful");
+                resetForm();
+              },
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onError: (error: any) => {
+                const errorMessage =
+                  error?.response?.data?.message || "Invalid credentials";
+                setErrors({ email: errorMessage });
+                toast.error(errorMessage);
+              },
+              onSettled: () => {
+                setSubmitting(false);
+              },
+            });
+          }}
         >
-          {({ errors, touched }) => (
+          {({ errors, touched, isSubmitting }) => (
             <Form>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -97,6 +100,7 @@ export default function LoginForm() {
                         ? "border-red-500"
                         : ""
                     }
+                    placeholder="Password"
                   />
                   <ErrorMessage
                     name="password"
@@ -109,9 +113,11 @@ export default function LoginForm() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={mutation.isPending || isSubmitting}
                 >
-                  {isSubmitting ? "Logging in..." : "Login"}
+                  {mutation.isPending || isSubmitting
+                    ? "Logging in..."
+                    : "Login"}
                 </Button>
                 <div className="text-center text-sm">
                   Don&apos;t have an account?{" "}

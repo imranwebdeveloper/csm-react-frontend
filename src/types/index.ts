@@ -1,3 +1,5 @@
+import { I } from "node_modules/react-router/dist/development/route-data-H2S3hwhf.d.mts";
+
 export interface IContent {
   id: string;
   userId: string;
@@ -17,4 +19,27 @@ export interface IUser {
   image?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  contents: IContent[];
+}
+
+export interface AuthUser {
+  token: string;
+  user: IUser;
+}
+
+export interface ApiMultiResponse<T> {
+  data: T;
+  message: string;
+  success: boolean;
+  pagination: {
+    totalPages: number;
+    limit: number;
+    total: number;
+    currentPage: number;
+  };
+}
+export interface ApiSingleResponse<T> {
+  data: T;
+  message: string;
+  success: boolean;
 }

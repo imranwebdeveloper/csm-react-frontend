@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AuthProvider from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
+import UserDetails from "./pages/UserDetails";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Home />} />
+              <Route path="/users/:id" element={<UserDetails />} />
             </Route>
 
             <Route element={<AuthLayout />}>

@@ -60,7 +60,7 @@ export default function Navbar() {
                 ) : (
                   <>
                     <NavLink
-                      to="/auth/login"
+                      to="/login"
                       className={`${
                         pathname === "/auth/login"
                           ? "text-foreground"
@@ -70,7 +70,7 @@ export default function Navbar() {
                       Login
                     </NavLink>
                     <NavLink
-                      to="/auth/register"
+                      to="/register"
                       className={`${
                         pathname === "/auth/register"
                           ? "text-foreground"
@@ -162,10 +162,10 @@ export default function Navbar() {
           ) : (
             <div className="hidden md:flex gap-2">
               <Button asChild variant="ghost" size="sm">
-                <Link to="/auth/login">Login</Link>
+                <Link to="/login">Login</Link>
               </Button>
               <Button asChild size="sm">
-                <Link to="/auth/register">Register</Link>
+                <Link to="/register">Register</Link>
               </Button>
             </div>
           )}
