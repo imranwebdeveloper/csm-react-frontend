@@ -4,13 +4,14 @@ import {
   removeUserFromStorage,
   saveUserToStorage,
 } from "@/lib/storage";
-import { AuthUser } from "@/types";
+import { AuthUser, IUser } from "@/types";
 import { createContext, useEffect, useState } from "react";
 
 interface AuthContextType {
   user: AuthUser | null;
   login: (credentials: AuthUser) => void;
   logout: () => void;
+  updateUser: (user: IUser) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -27,6 +28,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     removeUserFromStorage();
+  };
+
+  const updateUser = (user: IUser) => {
+    if (user) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setUser((pre: any) => {
+        return {
+          ...pre,
+          user: {
+            ...pre?.user,
+            ...user,
+          },
+        };
+      });
+    }
   };
 
   useEffect(() => {
@@ -46,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

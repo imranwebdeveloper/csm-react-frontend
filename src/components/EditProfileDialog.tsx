@@ -10,8 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { Textarea } from "@/components/ui/textarea";
-import { IUser } from "@/types";
+import { ApiSingleResponse, IUser } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { updateProfile } from "@/api/authApi";
@@ -31,12 +30,13 @@ interface EditProfileDialogProps {
 
 const EditProfileDialog = ({ profile, onClose }: EditProfileDialogProps) => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const mutation = useMutation({
     mutationFn: (values: { username: string }) =>
       updateProfile(values, user?.token || ""),
-    onSuccess: () => {
+    onSuccess: (data: ApiSingleResponse<IUser>) => {
+      updateUser(data.data);
       toast.success("Profile updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       onClose();

@@ -50,10 +50,10 @@ export default function LoginForm() {
           onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
             mutation.mutate(values, {
               onSuccess: (data: ApiSingleResponse<AuthUser>) => {
+                navigate({ pathname: "/" });
                 login(data.data);
                 toast.success("Login successful");
                 resetForm();
-                navigate({ pathname: "/login" });
               },
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onError: (error: any) => {

@@ -1,7 +1,14 @@
+import { useAuth } from "@/hooks/useAuth";
 import Navbar from "../shared/Navbar";
-import { Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router";
 
 const UserLayout = () => {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Navigate to={"/login"} replace />;
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />

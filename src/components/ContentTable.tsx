@@ -18,6 +18,8 @@ import { ApiMultiResponse, IContent } from "@/types";
 import { toast } from "react-toastify";
 import Spinner from "./ui/spiner";
 import ContentForm from "./ContentForm";
+import { Link } from "react-router";
+import { DeleteConfirmation } from "./DeleteConfirmation";
 
 export default function ContentTable() {
   const { user } = useAuth();
@@ -25,6 +27,8 @@ export default function ContentTable() {
   const queryClient = useQueryClient();
   const [formType, setFormType] = useState<"add" | "edit">("add");
   const [selectedContent, setSelectedContent] = useState<IContent | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+  const [deleteItem, setDeleteItem] = useState<IContent | null>(null);
 
   const { data, error, isPending } = useQuery<ApiMultiResponse<IContent[]>>({
     queryKey: ["content", user?.token],
@@ -57,10 +61,10 @@ export default function ContentTable() {
 
   const contentData = data?.data || [];
 
-  const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete?");
-    if (confirmDelete) {
-      deleteMutation.mutate(id);
+  const handleDelete = async () => {
+    if (deleteItem?.id) {
+      deleteMutation.mutate(deleteItem.id);
+      setDeleteItem(null);
     }
   };
 
@@ -80,60 +84,73 @@ export default function ContentTable() {
       </div>
 
       <div className="rounded-md border">
-        {contentData.length === 0 && (
+        {contentData.length === 0 ? (
           <p className="text-2xl text-center font-semibold py-10">
             No content found
           </p>
+        ) : (
+          <>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[250px]">Title</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Description
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Created
+                  </TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {contentData.map((content) => (
+                  <TableRow key={content.id}>
+                    <TableCell className="font-medium">
+                      <Link
+                        className="text-blue-500 underline"
+                        to={`/users/${content.userId}`}
+                      >
+                        {truncateText(content.title, 30)}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {truncateText(content.description || "", 50)}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {formatDate(content?.createdAt?.toString())}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => {
+                            setFormType("edit");
+                            setIsAddDialogOpen(true);
+                            setSelectedContent(content);
+                          }}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => {
+                            setDeleteConfirmation(true);
+                            setDeleteItem(content);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </>
         )}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[250px]">Title</TableHead>
-              <TableHead className="hidden md:table-cell">
-                Description
-              </TableHead>
-              <TableHead className="hidden md:table-cell">Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {contentData.map((content) => (
-              <TableRow key={content.id}>
-                <TableCell className="font-medium">
-                  {truncateText(content.title, 30)}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {truncateText(content.description || "", 50)}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {formatDate(content?.createdAt?.toString())}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => {
-                        setFormType("edit");
-                        setIsAddDialogOpen(true);
-                        setSelectedContent(content);
-                      }}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => handleDelete(content.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <ContentForm
             onClose={() => {
@@ -145,6 +162,12 @@ export default function ContentTable() {
             content={selectedContent}
           />
         </Dialog>
+
+        <DeleteConfirmation
+          onConfirm={handleDelete}
+          open={deleteConfirmation}
+          setOpen={setDeleteConfirmation}
+        />
       </div>
     </div>
   );
