@@ -4,6 +4,8 @@
 
 This project is a web application where registered users can create and manage their own publicly viewable content. While content can be viewed by all visitors, only the owner can edit their content.
 
+## Video Demo : [Watch](https://drive.google.com/file/d/1H-j_nyGmt-hRjC0AxeRXa6KO8gLsrQJX/view?usp=drive_link)
+
 ## Features
 
 - User authentication (login & registration)
