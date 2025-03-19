@@ -1,54 +1,56 @@
-# React + TypeScript + Vite
+# Content Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Description
 
-Currently, two official plugins are available:
+This project is a web application where registered users can create and manage their own publicly viewable content. While content can be viewed by all visitors, only the owner can edit their content.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- User authentication (login & registration)
+- Profile management (view & edit profile details)
+- Content management (add & edit YouTube embed links)
+- Public user listing for visitors
+- Form validation with Formik & Yup
+- API integration with Axios & React Query
+- UI components using ShadCN UI
+- Role-based access control
+- Secure authentication with JWT
+- Responsive design with Tailwind CSS
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Technologies Used
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- React.js
+- TypeScript
+- Context API
+- React Query
+- Formik & Yup
+- Tailwind CSS
+- ShadCN UI
+- React Router
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Backend Dependency
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+This project depends on the backend repository available at:
+[Backend Repository](https://github.com/imranwebdeveloper/csm-express-backend)
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+### Frontend Setup
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/imranwebdeveloper/csm-react-frontend.git
+   cd csm-frontend
+   ```
+2. Install dependencies:
+   ```sh
+   npm install  # or yarn install
+   ```
+3. Configure environment variables:
+   - Create a `.env` file in the root directory
+   - Add the following environment variables:
+     ```env
+     VITE_API_BASE_URL=http://localhost:5000
+     ```
+4. Start the development server:
+   ```sh
+   npm run dev  # or yarn dev
+   ```

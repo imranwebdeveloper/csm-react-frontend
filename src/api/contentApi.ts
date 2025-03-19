@@ -1,7 +1,8 @@
+import config from "@/config/env";
 import { IContent } from "@/types";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api/contents";
+const API_BASE_URL = `${config.env.API_URL}/contents`;
 
 // Fetch all public contents
 export const getContents = async (token: string) => {

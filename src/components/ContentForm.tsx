@@ -80,9 +80,13 @@ export default function ContentForm({
   return (
     <DialogContent className="sm:max-w-[600px]">
       <DialogHeader>
-        <DialogTitle>Add New Content</DialogTitle>
+        <DialogTitle>
+          {formType === "add" ? "Add" : "Update"} Content
+        </DialogTitle>
         <DialogDescription>
-          Create new content to share with your audience.
+          {formType === "add"
+            ? "Create content to share with your audience. "
+            : "Update content to share with your audience. "}
         </DialogDescription>
       </DialogHeader>
 
