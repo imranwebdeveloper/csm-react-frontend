@@ -1,5 +1,3 @@
-"use client";
-
 import { Menu, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +16,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const location = useLocation(); // ✅ Get current pathname
   const pathname = location.pathname;
+  const profile = user?.user;
 
   return (
     <header className="sticky  top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -89,33 +88,11 @@ export default function Navbar() {
           <Link to="/" className="flex items-center gap-2 font-semibold">
             ContentHub
           </Link>
-          <nav className="hidden md:flex gap-6">
-            <NavLink
-              to="/"
-              className={`${
-                pathname === "/" ? "text-foreground" : "text-muted-foreground"
-              } hover:text-foreground text-sm font-medium transition-colors`}
-            >
-              Home
-            </NavLink>
-            {user && (
-              <NavLink
-                to="/dashboard"
-                className={`${
-                  pathname === "/dashboard"
-                    ? "text-foreground"
-                    : "text-muted-foreground"
-                } hover:text-foreground text-sm font-medium transition-colors`}
-              >
-                Dashboard
-              </NavLink>
-            )}
-          </nav>
         </div>
 
         {/* User Authentication Section */}
         <div className="flex items-center gap-2">
-          {user ? (
+          {profile ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -123,9 +100,12 @@ export default function Navbar() {
                   className="relative h-8 w-8 rounded-full"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar || ""} alt={user.name} />
+                    <AvatarImage
+                      src={profile?.image || ""}
+                      alt={profile?.username}
+                    />
                     <AvatarFallback>
-                      {user.name.substring(0, 2).toUpperCase()}
+                      {profile?.username.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -133,15 +113,15 @@ export default function Navbar() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user.name}</p>
+                    <p className="font-medium">{profile?.username}</p>
                     <p className="text-xs text-muted-foreground">
-                      {user.email}
+                      {profile?.email}
                     </p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to={`/profile/${user.id}`} className="cursor-pointer">
+                  <Link to={`/profile`} className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </Link>

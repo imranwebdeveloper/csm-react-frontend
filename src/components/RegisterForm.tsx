@@ -1,4 +1,4 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import {
@@ -12,11 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { registerUser } from "@/api/authApi"; // Import register API
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 const RegisterSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
+  username: Yup.string().required("Username is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
@@ -27,33 +29,20 @@ const RegisterSchema = Yup.object().shape({
 });
 
 export default function RegisterForm() {
-  //   const router = useRouter();
-  //   const { toast } = useToast();
-  const { register } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async (values: any) => {
-    setIsSubmitting(true);
-    try {
-      await register(values);
-      //   toast({
-      //     title: "Registration successful",
-      //     description: "You have been registered successfully",
-      //   });
-      //   router.push("/auth/login");
-    } catch (error: any) {
-      //   toast({
-      //     title: "Registration failed",
-      //     description: error.message || "Something went wrong",
-      //     variant: "destructive",
-      //   });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const mutation = useMutation({
+    mutationFn: async (values: {
+      username: string;
+      email: string;
+      password: string;
+    }) => {
+      return registerUser(values);
+    },
+  });
 
   return (
-    <div className="container max-w-md mx-auto py-10">
+    <div className="container max-w-md mx-auto mt-10 py-10">
       <Card>
         <CardHeader>
           <CardTitle>Create an account</CardTitle>
@@ -63,30 +52,56 @@ export default function RegisterForm() {
         </CardHeader>
         <Formik
           initialValues={{
-            name: "",
+            username: "",
             email: "",
             password: "",
             confirmPassword: "",
           }}
           validationSchema={RegisterSchema}
-          onSubmit={handleSubmit}
+          onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+            mutation.mutate(
+              {
+                username: values.username,
+                email: values.email,
+                password: values.password,
+              },
+              {
+                onSuccess: () => {
+                  toast.success("Account created successfully. Please log in.");
+                  resetForm();
+                  navigate("/login"); // Redirect to login page
+                },
+                onError: (error: any) => {
+                  const errorMessage =
+                    error?.response?.data?.message || "Registration failed";
+                  setErrors({ email: errorMessage }); // Show error under email field
+                  toast.error(errorMessage);
+                },
+                onSettled: () => {
+                  setSubmitting(false);
+                },
+              }
+            );
+          }}
         >
-          {({ errors, touched }) => (
+          {({ errors, touched, isSubmitting }) => (
             <Form>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="username">Username</Label>
                   <Field
                     as={Input}
-                    id="name"
-                    name="name"
-                    placeholder="John Doe"
+                    id="username"
+                    name="username"
+                    placeholder="JohnDoe"
                     className={
-                      errors.name && touched.name ? "border-red-500" : ""
+                      errors.username && touched.username
+                        ? "border-red-500"
+                        : ""
                     }
                   />
                   <ErrorMessage
-                    name="name"
+                    name="username"
                     component="div"
                     className="text-sm text-red-500"
                   />
@@ -118,6 +133,7 @@ export default function RegisterForm() {
                     id="password"
                     name="password"
                     type="password"
+                    placeholder="********"
                     className={
                       errors.password && touched.password
                         ? "border-red-500"
@@ -138,6 +154,7 @@ export default function RegisterForm() {
                     id="confirmPassword"
                     name="confirmPassword"
                     type="password"
+                    placeholder="********"
                     className={
                       errors.confirmPassword && touched.confirmPassword
                         ? "border-red-500"
@@ -155,9 +172,11 @@ export default function RegisterForm() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={mutation.isPending || isSubmitting}
                 >
-                  {isSubmitting ? "Creating account..." : "Create account"}
+                  {mutation.isPending || isSubmitting
+                    ? "Creating account..."
+                    : "Create account"}
                 </Button>
                 <div className="text-center text-sm">
                   Already have an account?{" "}

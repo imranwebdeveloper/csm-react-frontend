@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { loginUser } from "@/api/authApi";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -25,6 +25,7 @@ const LoginSchema = Yup.object().shape({
 
 export default function LoginForm() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const mutation = useMutation({
     mutationFn: async (values: { email: string; password: string }) => {
       return loginUser(values);
@@ -52,6 +53,7 @@ export default function LoginForm() {
                 login(data.data);
                 toast.success("Login successful");
                 resetForm();
+                navigate({ pathname: "/login" });
               },
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onError: (error: any) => {
