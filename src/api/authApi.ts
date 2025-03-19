@@ -47,7 +47,11 @@ export const updateProfile = async (
 };
 
 export const fetchUsers = async () => {
-  const response = await axios.get(`${API_BASE_URL}/users?limit=100`);
+  const response = await axios.get(`${API_BASE_URL}/users?limit=32`);
+  return response.data;
+};
+export const getPublicContents = async () => {
+  const response = await axios.get(`${API_BASE_URL}/contents?limit=32`);
   return response.data;
 };
 export const fetchUser = async (id: string | undefined) => {

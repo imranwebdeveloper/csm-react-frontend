@@ -1,10 +1,15 @@
+import { IContent } from "@/types";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api/content"; // Update this with your backend URL
+const API_BASE_URL = "http://localhost:5000/api/contents";
 
 // Fetch all public contents
-export const getContents = async () => {
-  const response = await axios.get(`${API_BASE_URL}/`);
+export const getContents = async (token: string) => {
+  const response = await axios.get(`${API_BASE_URL}/users?limit=100`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
 
@@ -23,31 +28,38 @@ export const getUserContents = async () => {
 };
 
 // Create new content (Requires authentication)
-export const createContent = async (contentData: {
-  title: string;
-  url: string;
-}) => {
+export const createContent = async (
+  contentData: Partial<IContent>,
+  token: string
+) => {
   const response = await axios.post(`${API_BASE_URL}/`, contentData, {
-    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
   return response.data;
 };
 
 // Update content by ID (Requires authentication)
 export const updateContent = async (
+  contentData: Partial<IContent>,
   id: string,
-  contentData: { title?: string; url?: string }
+  token: string
 ) => {
   const response = await axios.put(`${API_BASE_URL}/${id}`, contentData, {
-    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
   return response.data;
 };
 
 // Delete content by ID (Requires authentication)
-export const deleteContent = async (id: string) => {
+export const deleteContent = async (id: string, token: string) => {
   const response = await axios.delete(`${API_BASE_URL}/${id}`, {
-    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
   return response.data;
 };

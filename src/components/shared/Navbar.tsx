@@ -1,4 +1,4 @@
-import { Menu, User, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,86 +7,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
-import { Link, NavLink, useLocation } from "react-router";
+import { Link } from "react-router";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const location = useLocation(); // ✅ Get current pathname
-  const pathname = location.pathname;
   const profile = user?.user;
 
   return (
     <header className="sticky  top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between  max-w-7xl mx-auto">
+      <div className="container px-4 flex h-16 items-center justify-between  max-w-7xl mx-auto">
         <div className="flex items-center gap-2 md:gap-6">
-          {/* Mobile Menu */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <nav className="grid gap-6 text-lg font-medium">
-                <NavLink to="/" className="text-lg font-semibold">
-                  ContentHub
-                </NavLink>
-                <NavLink
-                  to="/"
-                  className={`${
-                    pathname === "/"
-                      ? "text-foreground"
-                      : "text-muted-foreground"
-                  } hover:text-foreground`}
-                >
-                  Home
-                </NavLink>
-                {user ? (
-                  <NavLink
-                    to="/dashboard"
-                    className={`${
-                      pathname === "/dashboard"
-                        ? "text-foreground"
-                        : "text-muted-foreground"
-                    } hover:text-foreground`}
-                  >
-                    Dashboard
-                  </NavLink>
-                ) : (
-                  <>
-                    <NavLink
-                      to="/login"
-                      className={`${
-                        pathname === "/auth/login"
-                          ? "text-foreground"
-                          : "text-muted-foreground"
-                      } hover:text-foreground`}
-                    >
-                      Login
-                    </NavLink>
-                    <NavLink
-                      to="/register"
-                      className={`${
-                        pathname === "/auth/register"
-                          ? "text-foreground"
-                          : "text-muted-foreground"
-                      } hover:text-foreground`}
-                    >
-                      Register
-                    </NavLink>
-                  </>
-                )}
-              </nav>
-            </SheetContent>
-          </Sheet>
-
-          {/* Desktop Navigation */}
           <Link to="/" className="flex items-center gap-2 font-semibold">
-            ContentHub
+            CSMHub
           </Link>
         </div>
 
@@ -126,12 +60,7 @@ export default function Navbar() {
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer" onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -140,7 +69,7 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden md:flex gap-2">
+            <div className="flex gap-2">
               <Button asChild variant="ghost" size="sm">
                 <Link to="/login">Login</Link>
               </Button>

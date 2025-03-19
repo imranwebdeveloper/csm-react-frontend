@@ -1,5 +1,3 @@
-import { I } from "node_modules/react-router/dist/development/route-data-H2S3hwhf.d.mts";
-
 export interface IContent {
   id: string;
   userId: string;

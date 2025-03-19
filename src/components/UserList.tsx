@@ -1,19 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { fetchUsers } from "@/api/authApi";
 import { ApiMultiResponse, IUser } from "@/types";
 import Spinner from "./ui/spiner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+import { formatDate } from "@/lib/utils";
 
 export default function UserList() {
-  const { data, isLoading, error } = useQuery<ApiMultiResponse<IUser[]>>({
+  const { data, error, isPending } = useQuery<ApiMultiResponse<IUser[]>>({
     queryKey: ["users"],
     queryFn: fetchUsers,
+    refetchOnMount: true,
   });
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="my-10 flex justify-center">
         <Spinner />
@@ -27,32 +36,51 @@ export default function UserList() {
   const users = data?.data || [];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {users?.map((user) => (
-        <Card key={user.id} className="overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <Avatar>
-                <AvatarImage src={user.image || ""} alt={user.username} />
-                <AvatarFallback>
-                  {user.username.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">{user.username}</h3>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>User</TableHead>
+            <TableHead>Items</TableHead>
+            <TableHead>Joined</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {users?.map((user) => (
+            <TableRow key={user.id}>
+              <TableCell>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={user.image || ""} alt={user.username} />
+                    <AvatarFallback>
+                      {user.username.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{user.username}</p>
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
                 <p className="text-sm text-muted-foreground">
                   {user.contents.length || 0} items
                 </p>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="bg-muted/50 p-6">
-            <Button asChild className="w-full">
-              <Link to={`/users/${user.id}`}>View Details</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      ))}
+              </TableCell>
+              <TableCell>
+                <p className="text-sm text-muted-foreground">
+                  {formatDate(user?.createdAt?.toString() || "")}
+                </p>
+              </TableCell>
+              <TableCell className="text-right">
+                <Button asChild size="sm">
+                  <Link to={`/users/${user.id}`}>View Details</Link>
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
